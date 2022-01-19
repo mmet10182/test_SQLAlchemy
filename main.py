@@ -13,7 +13,7 @@ class Users(db.Model):
     email = db.Column(db.String(50), unique=True)
     psw = db.Column(db.String(500), nullable=True)
     date = db.Column(db.DateTime, default=datetime.utcnow)
-
+    pr = db.relationship('Profiles', backref='users', uselist=False) #this mechanism in the query will select the appropriate records from the profiles table
     def __repr__(self):
         return f"<users {self.id}>"
 
@@ -29,7 +29,13 @@ class Profiles(db.Model):
 
 @app.route("/")
 def index():
-    return render_template("index.html", title="Главная")
+    info = []
+    try:
+        info = Users.query.all()
+    except:
+        print("Ошибка добавления в БД")
+
+    return render_template("index.html", title="Главная", list=info)
 
 @app.route("/register", methods=("POST", "GET"))
 def register():
